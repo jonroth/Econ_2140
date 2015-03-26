@@ -1,0 +1,17 @@
+function fhat = f_kern(grid, X, Kern, h)
+    %save teh 
+    n = size(X,1);
+    J = size(grid,1);
+    
+    devmat = 1/h*(repmat(X',J,1) - repmat(grid,1,n) );
+    Kweights = K(devmat);
+    
+    fhat = sum(Kweights, 2)
+
+
+
+
+
+
+
+end

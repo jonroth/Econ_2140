@@ -1,0 +1,18 @@
+function m = kern_nw(grid, X, Y, Kern, h)
+
+    %save the length of X as n, length of grid as J
+    n = size(X,1);
+    J = size(grid,1);
+    
+    %Create a matrix devmat where the ij'th entry is 1/h*(X_j - g_i)
+    devmat = 1/h*(repmat(X',J,1) - repmat(grid,1,n) );
+    
+    %Evaluate K at the deviations (K should take a matrix and return
+    %elementwise results)
+    Kweights = Kern(devmat);
+    %Normalize the rows so that they sum to 1
+    Kweights = Kweights ./ repmat(n
+
+
+
+end
