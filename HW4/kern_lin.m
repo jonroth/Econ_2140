@@ -15,7 +15,7 @@ function  [mhat, Weights] = kern_lin(grid, X, Y, Kern, h)
     %Apply the w_i function below to all the elements of g. These are the
     %rows of the weighting matrix. Then stack them into the W matrix
     
-    wcell = arrayfun( @(g) w_i(g, X, Y, Kern, h), grid, 'UniformOutput', false);
+    wcell = arrayfun( @(g) w_g(g, X, Y, Kern, h), grid, 'UniformOutput', false);
     Weights = cell2mat(wcell);
 
     %Compute the predicted values of Y
@@ -28,7 +28,7 @@ end
 %Create a helper function that computes the weight vector for a scalar
 %value of g; i.e., one row of the weight matrix
 
-function w_i = w_i(g, X, Y, Kern, h)
+function w_g = w_g(g, X, Y, Kern, h)
     
     %Store length of X as 1
     n = size(X,1);
@@ -41,13 +41,11 @@ function w_i = w_i(g, X, Y, Kern, h)
     
     A =  z'* (Z' * diag(Kvec) * Z )^(-1);
     
-    A_rep = repmat(A,n,1);
+    %Create helper function w_ig that computes the weights for one X_i given g
+    w_ig = @(x_i, k_i) A * k_i * [1 x_i]';
     
-    B_rep = repmat(Kvec',1,length(z));
-    
-    C_rep = [ones(1,n); X'];
-    
-    w_i = diag(A_rep .* B_rep * C_rep)';
+    w_g = arrayfun(w_ig, X,Kvec')';
     
 end
+
 

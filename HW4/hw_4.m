@@ -165,3 +165,10 @@ hold on
 scatter(xgrid,yhat_lin,3)
 %scatter(prod1,yhat_lin,3)
 hold off
+
+
+
+testfn = @(x,y) x+y;
+x1 = 1:5;
+x2 = 5:9;
+arrayfun(testfn,x1,x2,'UniformOutput',false)
