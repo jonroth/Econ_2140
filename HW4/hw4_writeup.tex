@@ -1,0 +1,832 @@
+
+\documentclass[]{report}
+
+%packages
+%\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage[round]{natbib}
+%\usepackage{placeins}
+\usepackage{amssymb}
+%\usepackage{wasysym}
+\usepackage{abstract}
+\usepackage{hyperref}
+\usepackage{cancel}
+\usepackage[margin=1.00in]{geometry}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{mathdots}
+%\usepackage{fancyvrb}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{phaistos}
+\usepackage{subcaption}
+%\usepackage{appendix}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+
+\newcommand{\qu}[1]{``#1''}
+
+\newcommand{\treet}[1]{\text{\scriptsize \PHplaneTree}_{#1}}
+\newcommand{\treeleaft}[1]{\text{\scriptsize \PHplaneTree}_{#1}^{\text{\tiny \textleaf}}}
+\newcommand{\leaf}{\text{\scriptsize \textleaf}}
+
+\lstset{language = R, numbers = left, backgroundcolor = \color{backgcode}, title = \lstname, breaklines = true, basicstyle = \small, commentstyle = \footnotesize\color{Brown}, stringstyle = \ttfamily, tabsize = 2, fontadjust = true, showspaces = false, showstringspaces = false, texcl = true, numbers = none}
+
+\newcounter{probnum}
+\setcounter{probnum}{1}
+
+%create definition to allow local margin changes
+\def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
+\let\endchangemargin=\endlist 
+
+%allow equations to span multiple pages
+\allowdisplaybreaks
+
+%define colors and color typesetting conveniences
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{black}{rgb}{0,0,0}
+\definecolor{white}{rgb}{1,1,1}
+\definecolor{blue}{rgb}{0,0,0.7}
+\newcommand{\inblue}[1]{\color{blue}#1 \color{black}}
+\definecolor{green}{rgb}{0.133,0.545,0.133}
+\newcommand{\ingreen}[1]{\color{green}#1 \color{black}}
+\definecolor{yellow}{rgb}{1,0.549,0}
+\newcommand{\inyellow}[1]{\color{yellow}#1 \color{black}}
+\definecolor{red}{rgb}{1,0.133,0.133}
+\newcommand{\inred}[1]{\color{red}#1 \color{black}}
+\definecolor{purple}{rgb}{0.58,0,0.827}
+\newcommand{\inpurple}[1]{\color{purple}#1 \color{black}}
+\definecolor{backgcode}{rgb}{0.97,0.97,0.8}
+\definecolor{Brown}{cmyk}{0,0.81,1,0.60}
+\definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
+\definecolor{CadetBlue}{cmyk}{0.62,0.57,0.23,0}
+
+%define new math operators
+\DeclareMathOperator*{\argmax}{arg\,max~}
+\DeclareMathOperator*{\argmin}{arg\,min~}
+\DeclareMathOperator*{\argsup}{arg\,sup~}
+\DeclareMathOperator*{\arginf}{arg\,inf~}
+\DeclareMathOperator*{\convolution}{\text{\Huge{$\ast$}}}
+\newcommand{\infconv}[2]{\convolution^\infty_{#1 = 1} #2}
+%true functions
+
+%%%% GENERAL SHORTCUTS
+
+%shortcuts for pure typesetting conveniences
+\newcommand{\bv}[1]{\boldsymbol{#1}}
+
+%shortcuts for compound constants
+\newcommand{\BetaDistrConst}{\dfrac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)}}
+\newcommand{\NormDistrConst}{\dfrac{1}{\sqrt{2\pi\sigma^2}}}
+
+%shortcuts for conventional symbols
+\newcommand{\tsq}{\tau^2}
+\newcommand{\tsqh}{\hat{\tau}^2}
+\newcommand{\sigsq}{\sigma^2}
+\newcommand{\sigsqsq}{\parens{\sigma^2}^2}
+\newcommand{\sigsqovern}{\dfrac{\sigsq}{n}}
+\newcommand{\tausq}{\tau^2}
+\newcommand{\tausqalpha}{\tau^2_\alpha}
+\newcommand{\tausqbeta}{\tau^2_\beta}
+\newcommand{\tausqsigma}{\tau^2_\sigma}
+\newcommand{\betasq}{\beta^2}
+\newcommand{\sigsqvec}{\bv{\sigma}^2}
+\newcommand{\sigsqhat}{\hat{\sigma}^2}
+\newcommand{\Omegahat}{\hat{\Omega}}
+\newcommand{\sigsqhatmlebayes}{\sigsqhat_{\text{Bayes, MLE}}}
+\newcommand{\sigsqhatmle}[1]{\sigsqhat_{#1, \text{MLE}}}
+\newcommand{\bSigma}{\bv{\Sigma}}
+\newcommand{\bSigmainv}{\bSigma^{-1}}
+\newcommand{\thetavec}{\bv{\theta}}
+\newcommand{\thetahat}{\hat{\theta}}
+\newcommand{\thetahatmle}{\hat{\theta}_{\mathrm{MLE}}}
+\newcommand{\thetavechatmle}{\hat{\thetavec}_{\mathrm{MLE}}}
+\newcommand{\pihatmle}{\hat{\pi}_{\mathrm{MLE}}}
+\newcommand{\muhat}{\hat{\mu}}
+\newcommand{\musq}{\mu^2}
+\newcommand{\muvec}{\bv{\mu}}
+\newcommand{\pivec}{\bv{\pi}}
+\newcommand{\muhatmle}{\muhat_{\text{MLE}}}
+\newcommand{\lambdahat}{\hat{\lambda}}
+\newcommand{\lambdahatmle}{\lambdahat_{\text{MLE}}}
+\newcommand{\lambdahatmleone}{\lambdahat_{\text{MLE}, 1}}
+\newcommand{\lambdahatmletwo}{\lambdahat_{\text{MLE}, 2}}
+\newcommand{\etavec}{\bv{\eta}}
+\newcommand{\alphavec}{\bv{\alpha}}
+\newcommand{\minimaxdec}{\delta^*_{\mathrm{mm}}}
+\newcommand{\ybar}{\bar{y}}
+\newcommand{\xbar}{\bar{x}}
+\newcommand{\Xbar}{\bar{X}}
+\newcommand{\Ybar}{\bar{Y}}
+
+\newcommand{\iid}{~{\buildrel iid \over \sim}~}
+\newcommand{\inddist}{~{\buildrel ind \over \sim}~}
+\newcommand{\approxdist}{~~{\buildrel approx \over \sim}~~}
+\newcommand{\equalsindist}{~{\buildrel d \over =}~}
+\newcommand{\lik}[1]{L\parens{#1}}
+\newcommand{\loglik}[1]{\ell\parens{#1}}
+\newcommand{\thetahatkminone}{\thetahat^{(k-1)}}
+\newcommand{\thetahatkplusone}{\thetahat^{(k+1)}}
+\newcommand{\thetahatk}{\thetahat^{(k)}}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\third}{\frac{1}{3}}
+\newcommand{\twothirds}{\frac{2}{3}}
+\newcommand{\fourth}{\frac{1}{4}}
+\newcommand{\fifth}{\frac{1}{5}}
+\newcommand{\sixth}{\frac{1}{6}}
+
+%shortcuts for vector and matrix notation
+\newcommand{\A}{\bv{A}}
+\newcommand{\At}{\A^T}
+\newcommand{\Ainv}{\inverse{\A}}
+\newcommand{\B}{\bv{B}}
+\newcommand{\C}{\bv{C}}
+\newcommand{\D}{\bv{D}}
+\newcommand{\K}{\bv{K}}
+\newcommand{\Kt}{\K^T}
+\newcommand{\Kinv}{\inverse{K}}
+\newcommand{\Kinvt}{(\Kinv)^T}
+\newcommand{\M}{\bv{M}}
+\newcommand{\Bt}{\B^T}
+\newcommand{\Q}{\bv{Q}}
+\newcommand{\E}{\bv{E}}
+\newcommand{\Et}{\E^\top}
+\newcommand{\Qt}{\Q^T}
+\newcommand{\R}{\bv{R}}
+\newcommand{\Rt}{\R^\top}
+\newcommand{\Z}{\bv{Z}}
+\newcommand{\X}{\bv{X}}
+\renewcommand{\H}{\bv{H}}
+\newcommand{\Xsub}{\X_{\text{(sub)}}}
+\newcommand{\Xsubadj}{\X_{\text{(sub,adj)}}}
+\newcommand{\I}{\bv{I}}
+\newcommand{\J}{\bv{J}}
+\newcommand{\0}{\bv{0}}
+\newcommand{\1}{\bv{1}}
+\newcommand{\Y}{\bv{Y}}
+\newcommand{\Yt}{\Y^\top}
+\newcommand{\tvec}{\bv{t}}
+\newcommand{\sigsqI}{\sigsq\I}
+\renewcommand{\P}{\bv{P}}
+\newcommand{\Psub}{\P_{\text{(sub)}}}
+\newcommand{\Pt}{\P^T}
+\newcommand{\Pii}{P_{ii}}
+\newcommand{\Pij}{P_{ij}}
+\newcommand{\IminP}{(\I-\P)}
+\newcommand{\Xt}{\bv{X}^T}
+\newcommand{\XtX}{\Xt\X}
+\newcommand{\XtXinv}{\parens{\Xt\X}^{-1}}
+\newcommand{\XtXinvXt}{\XtXinv\Xt}
+\newcommand{\XXtXinvXt}{\X\XtXinvXt}
+\newcommand{\x}{\bv{x}}
+\newcommand{\onevec}{\bv{1}}
+\newcommand{\zerovec}{\bv{0}}
+\newcommand{\onevectr}{\onevec^\top}
+\newcommand{\oneton}{1, \ldots, n}
+\newcommand{\yoneton}{y_1, \ldots, y_n}
+\newcommand{\yonetonorder}{y_{(1)}, \ldots, y_{(n)}}
+\newcommand{\Yoneton}{Y_1, \ldots, Y_n}
+\newcommand{\iinoneton}{i \in \braces{\oneton}}
+\newcommand{\onetom}{1, \ldots, m}
+\newcommand{\jinonetom}{j \in \braces{\onetom}}
+\newcommand{\xoneton}{x_1, \ldots, x_n}
+\newcommand{\Xoneton}{X_1, \ldots, X_n}
+\newcommand{\xt}{\x^T}
+\newcommand{\y}{\bv{y}}
+\newcommand{\yt}{\y^T}
+\newcommand{\n}{\bv{n}}
+\renewcommand{\c}{\bv{c}}
+\newcommand{\ct}{\c^T}
+\newcommand{\tstar}{\bv{t}^*}
+\renewcommand{\u}{\bv{u}}
+\renewcommand{\v}{\bv{v}}
+\renewcommand{\a}{\bv{a}}
+\newcommand{\s}{\bv{s}}
+\newcommand{\yadj}{\y_{\text{(adj)}}}
+\newcommand{\xjadj}{\x_{j\text{(adj)}}}
+\newcommand{\xjadjM}{\x_{j \perp M}}
+\newcommand{\yhat}{\hat{y}}
+\newcommand{\yhatsub}{\yhat_{\text{(sub)}}}
+\newcommand{\yhatstar}{\yhat^*}
+\newcommand{\yhatstarnew}{\yhatstar_{\text{new}}}
+\newcommand{\z}{\bv{z}}
+\newcommand{\zt}{\z^T}
+\newcommand{\bb}{\bv{b}}
+\newcommand{\bbt}{\bb^T}
+\newcommand{\bbeta}{\bv{\beta}}
+\newcommand{\beps}{\bv{\epsilon}}
+\newcommand{\bepst}{\beps^T}
+\newcommand{\e}{\bv{e}}
+\newcommand{\bgamma}{\bv{\gamma}}
+\newcommand{\Mofy}{\M(\y)}
+\newcommand{\KofAlpha}{K(\alpha)}
+\newcommand{\ellset}{\mathcal{L}}
+\newcommand{\oneminalph}{1-\alpha}
+\newcommand{\SSE}{\text{SSE}}
+\newcommand{\SSEsub}{\text{SSE}_{\text{(sub)}}}
+\newcommand{\MSE}{\text{MSE}}
+\newcommand{\RMSE}{\text{RMSE}}
+\newcommand{\SSR}{\text{SSR}}
+\newcommand{\SST}{\text{SST}}
+\newcommand{\JSest}{\delta_{\text{JS}}(\x)}
+\newcommand{\Bayesest}{\delta_{\text{Bayes}}(\x)}
+\newcommand{\EmpBayesest}{\delta_{\text{EmpBayes}}(\x)}
+\newcommand{\BLUPest}{\delta_{\text{BLUP}}}
+\newcommand{\MLEest}[1]{\hat{#1}_{\text{MLE}}}
+
+%shortcuts for Linear Algebra stuff (i.e. vectors and matrices)
+\newcommand{\twovec}[2]{\parens{\begin{array}{c} #1 \\ #2 \end{array}}}
+\newcommand{\threevec}[3]{\parens{\begin{array}{c} #1 \\ #2 \\ #3 \end{array}}}
+\newcommand{\fivevec}[5]{\parens{\begin{array}{c} #1 \\ #2 \\ #3 \\ #4 \\ #5 \end{array}}}
+\newcommand{\twobytwomat}[4]{\parens{\begin{array}{cc} #1 & #2 \\ #3 & #4 \end{array}}}
+\newcommand{\threebytwomat}[6]{\parens{\begin{array}{cc} #1 & #2 \\ #3 & #4 \\ #5 & #6 \end{array}}}
+\newcommand{\fourvec}[4]{\parens{\begin{array}{c} #1 \\ #2 \\ #3 \\ #4\end{array}}}
+\newcommand{\threebythreemat}[9]{\parens{\begin{array}{ccc} #1 & #2 & #3 \\  #4 & #5 & #6 \\ #7 & #8 & #9 \end{array}}}
+
+%shortcuts for conventional compound symbols
+\newcommand{\thetainthetas}{\theta \in \Theta}
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\complexes}{\mathbb{C}}
+\newcommand{\rationals}{\mathbb{Q}}
+\newcommand{\integers}{\mathbb{Z}}
+\newcommand{\naturals}{\mathbb{N}}
+\newcommand{\forallninN}{~~\forall n \in \naturals}
+\newcommand{\forallxinN}[1]{~~\forall #1 \in \reals}
+\newcommand{\matrixdims}[2]{\in \reals^{\,#1 \times #2}}
+\newcommand{\inRn}[1]{\in \reals^{\,#1}}
+\newcommand{\mathimplies}{\quad\Rightarrow\quad}
+\newcommand{\mathequiv}{\quad\Leftrightarrow\quad}
+\newcommand{\eqncomment}[1]{\quad \text{(#1)}}
+\newcommand{\limitn}{\lim_{n \rightarrow \infty}}
+\newcommand{\limitN}{\lim_{N \rightarrow \infty}}
+\newcommand{\limitd}{\lim_{d \rightarrow \infty}}
+\newcommand{\limitt}{\lim_{t \rightarrow \infty}}
+\newcommand{\limitsupn}{\limsup_{n \rightarrow \infty}~}
+\newcommand{\limitinfn}{\liminf_{n \rightarrow \infty}~}
+\newcommand{\limitk}{\lim_{k \rightarrow \infty}}
+\newcommand{\limsupn}{\limsup_{n \rightarrow \infty}}
+\newcommand{\limsupk}{\limsup_{k \rightarrow \infty}}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+
+%shortcuts for environments
+\newcommand{\beqn}{\vspace{-0.25cm}\begin{eqnarray*}}
+\newcommand{\eeqn}{\end{eqnarray*}}
+\newcommand{\bneqn}{\vspace{-0.25cm}\begin{eqnarray}}
+\newcommand{\eneqn}{\end{eqnarray}}
+
+\newcommand{\beans}{\color{blue} \beqn  \text{Ans:}~~~}
+\newcommand{\eeans}{\eeqn \color{black}}
+
+%shortcuts for mini environments
+\newcommand{\parens}[1]{\left(#1\right)}
+\newcommand{\squared}[1]{\parens{#1}^2}
+\newcommand{\tothepow}[2]{\parens{#1}^{#2}}
+\newcommand{\prob}[1]{\mathbb{P}\parens{#1}}
+\newcommand{\cprob}[2]{\prob{#1~|~#2}}
+\newcommand{\littleo}[1]{o\parens{#1}}
+\newcommand{\bigo}[1]{O\parens{#1}}
+\newcommand{\Lp}[1]{\mathbb{L}^{#1}}
+\renewcommand{\arcsin}[1]{\text{arcsin}\parens{#1}}
+\newcommand{\prodonen}[2]{\prod_{#1=1}^n #2}
+\newcommand{\mysum}[4]{\sum_{#1=#2}^{#3} #4}
+\newcommand{\sumonen}[2]{\sum_{#1=1}^n #2}
+\newcommand{\infsum}[2]{\sum_{#1=1}^\infty #2}
+\newcommand{\infprod}[2]{\prod_{#1=1}^\infty #2}
+\newcommand{\infunion}[2]{\bigcup_{#1=1}^\infty #2}
+\newcommand{\infinter}[2]{\bigcap_{#1=1}^\infty #2}
+\newcommand{\infintegral}[2]{\int^\infty_{-\infty} #2 ~\text{d}#1}
+\newcommand{\supthetas}[1]{\sup_{\thetainthetas}\braces{#1}}
+\newcommand{\bracks}[1]{\left[#1\right]}
+\newcommand{\braces}[1]{\left\{#1\right\}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\abss}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+\newcommand{\normsq}[1]{\norm{#1}^2}
+\newcommand{\inverse}[1]{\parens{#1}^{-1}}
+\newcommand{\rowof}[2]{\parens{#1}_{#2\cdot}}
+
+%shortcuts for functionals
+\newcommand{\realcomp}[1]{\text{Re}\bracks{#1}}
+\newcommand{\imagcomp}[1]{\text{Im}\bracks{#1}}
+\newcommand{\range}[1]{\text{range}\bracks{#1}}
+\newcommand{\colsp}[1]{\text{colsp}\bracks{#1}}
+\newcommand{\rowsp}[1]{\text{rowsp}\bracks{#1}}
+\newcommand{\tr}[1]{\text{tr}\bracks{#1}}
+\newcommand{\diag}[1]{\text{diag}\bracks{#1}}
+\newcommand{\rank}[1]{\text{rank}\bracks{#1}}
+\newcommand{\proj}[2]{\text{Proj}_{#1}\bracks{#2}}
+\newcommand{\projcolspX}[1]{\text{Proj}_{\colsp{\X}}\bracks{#1}}
+\newcommand{\median}[1]{\text{median}\bracks{#1}}
+\newcommand{\mean}[1]{\text{mean}\bracks{#1}}
+\newcommand{\dime}[1]{\text{dim}\bracks{#1}}
+\renewcommand{\det}[1]{\text{det}\bracks{#1}}
+\newcommand{\expe}[1]{\mathbb{E}\bracks{#1}}
+\newcommand{\cexpe}[2]{\expe{#1 ~ | ~ #2}}
+\newcommand{\expeabs}[1]{\expe{\abss{#1}}}
+\newcommand{\expesub}[2]{\mathbb{E}_{#1}\bracks{#2}}
+\newcommand{\indic}[1]{\mathds{1}_{#1}}
+\newcommand{\var}[1]{\mathbb{V}\text{ar}\bracks{#1}}
+\newcommand{\varhat}[1]{\hat{\mathbb{V}\text{ar}}\bracks{#1}}
+\newcommand{\cov}[2]{\mathbb{C}\text{ov}\bracks{#1, #2}}
+\newcommand{\corr}[2]{\text{Corr}\bracks{#1, #2}}
+\newcommand{\se}[1]{\text{SE}\bracks{#1}}
+\newcommand{\seest}[1]{\hat{\text{SE}}\bracks{#1}}
+\newcommand{\bias}[1]{\text{Bias}\bracks{#1}}
+\newcommand{\partialop}[2]{\dfrac{\partial}{\partial #1}\bracks{#2}}
+\newcommand{\secpartialop}[2]{\dfrac{\partial^2}{\partial #1^2}\bracks{#2}}
+\newcommand{\mixpartialop}[3]{\dfrac{\partial^2}{\partial #1 \partial #2}\bracks{#3}}
+%shortcuts for functions
+\renewcommand{\exp}[1]{\mathrm{exp}\parens{#1}}
+\renewcommand{\cos}[1]{\text{cos}\parens{#1}}
+\renewcommand{\sin}[1]{\text{sin}\parens{#1}}
+\newcommand{\sign}[1]{\text{sign}\parens{#1}}
+\newcommand{\are}[1]{\mathrm{ARE}\parens{#1}}
+\newcommand{\natlog}[1]{\ln\parens{#1}}
+\newcommand{\oneover}[1]{\frac{1}{#1}}
+\newcommand{\overtwo}[1]{\frac{#1}{2}}
+\newcommand{\overn}[1]{\frac{#1}{n}}
+\newcommand{\oneoversqrt}[1]{\oneover{\sqrt{#1}}}
+\newcommand{\sqd}[1]{\parens{#1}^2}
+\newcommand{\loss}[1]{\ell\parens{\theta, #1}}
+\newcommand{\losstwo}[2]{\ell\parens{#1, #2}}
+\newcommand{\cf}{\phi(t)}
+
+\newcommand{\partiald}[2]{ \dfrac{\partial #1}{\partial #2}}
+\newcommand{\partialdtwo}[3]{ \dfrac{\partial^2 #1}{\partial #2 \, \partial #3}}
+
+%English language specific shortcuts
+\newcommand{\ie}{\textit{i.e.} }
+\newcommand{\AKA}{\textit{AKA} }
+\renewcommand{\iff}{\textit{iff}}
+\newcommand{\eg}{\textit{e.g.} }
+\newcommand{\st}{\textit{s.t.} }
+\newcommand{\wrt}{\textit{w.r.t.} }
+\newcommand{\mathst}{~~\text{\st}~~}
+\newcommand{\mathand}{~~\text{and}~~}
+\newcommand{\mathor}{~~\text{or}~~}
+\newcommand{\ala}{\textit{a la} }
+\newcommand{\ppp}{posterior predictive p-value}
+\newcommand{\dd}{dataset-to-dataset}
+
+%shortcuts for distribution titles
+\newcommand{\logistic}[2]{\mathrm{Logistic}\parens{#1,\,#2}}
+\newcommand{\bernoulli}[1]{\mathrm{Bernoulli}\parens{#1}}
+\newcommand{\betanot}[2]{\mathrm{Beta}\parens{#1,\,#2}}
+\newcommand{\stdbetanot}{\betanot{\alpha}{\beta}}
+\newcommand{\multnormnot}[3]{\mathcal{N}_{#1}\parens{#2,\,#3}}
+\newcommand{\normnot}[2]{\mathcal{N}\parens{#1,\,#2}}
+\newcommand{\classicnormnot}{\normnot{\mu}{\sigsq}}
+\newcommand{\stdnormnot}{\normnot{0}{1}}
+\newcommand{\uniform}[2]{\mathrm{U}\parens{#1,\,#2}}
+\newcommand{\stduniform}{\uniform{0}{1}}
+\newcommand{\exponential}[1]{\mathrm{Exp}\parens{#1}}
+\newcommand{\stdexponential}{\mathrm{Exp}\parens{1}}
+\newcommand{\gammadist}[2]{\mathrm{Gamma}\parens{#1, #2}}
+\newcommand{\poisson}[1]{\mathrm{Poisson}\parens{#1}}
+\newcommand{\geometric}[1]{\mathrm{Geometric}\parens{#1}}
+\newcommand{\binomial}[2]{\mathrm{Binomial}\parens{#1,\,#2}}
+\newcommand{\rayleigh}[1]{\mathrm{Rayleigh}\parens{#1}}
+\newcommand{\multinomial}[2]{\mathrm{Multinomial}\parens{#1,\,#2}}
+\newcommand{\gammanot}[2]{\mathrm{Gamma}\parens{#1,\,#2}}
+\newcommand{\cauchynot}[2]{\text{Cauchy}\parens{#1,\,#2}}
+\newcommand{\invchisqnot}[1]{\text{Inv}\chisq{#1}}
+\newcommand{\invscaledchisqnot}[2]{\text{ScaledInv}\ncchisq{#1}{#2}}
+\newcommand{\invgammanot}[2]{\text{InvGamma}\parens{#1,\,#2}}
+\newcommand{\chisq}[1]{\chi^2_{#1}}
+\newcommand{\ncchisq}[2]{\chi^2_{#1}\parens{#2}}
+\newcommand{\ncF}[3]{F_{#1,#2}\parens{#3}}
+
+%shortcuts for PDF's of common distributions
+\newcommand{\logisticpdf}[3]{\oneover{#3}\dfrac{\exp{-\dfrac{#1 - #2}{#3}}}{\parens{1+\exp{-\dfrac{#1 - #2}{#3}}}^2}}
+\newcommand{\betapdf}[3]{\dfrac{\Gamma(#2 + #3)}{\Gamma(#2)\Gamma(#3)}#1^{#2-1} (1-#1)^{#3-1}}
+\newcommand{\normpdf}[3]{\frac{1}{\sqrt{2\pi#3}}\exp{-\frac{1}{2#3}(#1 - #2)^2}}
+\newcommand{\normpdfvarone}[2]{\dfrac{1}{\sqrt{2\pi}}e^{-\half(#1 - #2)^2}}
+\newcommand{\chisqpdf}[2]{\dfrac{1}{2^{#2/2}\Gamma(#2/2)}\; {#1}^{#2/2-1} e^{-#1/2}}
+\newcommand{\invchisqpdf}[2]{\dfrac{2^{-\overtwo{#1}}}{\Gamma(#2/2)}\,{#1}^{-\overtwo{#2}-1}  e^{-\oneover{2 #1}}}
+\newcommand{\normpdfmeanzero}[2]{\frac{1}{\sqrt{2\pi#2}}\exp{-\frac{1}{2#2}#1^2}}
+\newcommand{\exponentialpdf}[2]{#2\exp{-#2#1}}
+\newcommand{\poissonpdf}[2]{\dfrac{e^{-#1} #1^{#2}}{#2!}}
+\newcommand{\binomialpdf}[3]{\binom{#2}{#1}#3^{#1}(1-#3)^{#2-#1}}
+\newcommand{\rayleighpdf}[2]{\dfrac{#1}{#2^2}\exp{-\dfrac{#1^2}{2 #2^2}}}
+\newcommand{\gammapdf}[3]{\dfrac{#3^#2}{\Gamma\parens{#2}}#1^{#2-1}\exp{-#3 #1}}
+\newcommand{\cauchypdf}[3]{\oneover{\pi} \dfrac{#3}{\parens{#1-#2}^2 + #3^2}}
+\newcommand{\Gammaf}[1]{\Gamma\parens{#1}}
+
+%shortcuts for miscellaneous typesetting conveniences
+\newcommand{\notesref}[1]{\marginpar{\color{gray}\tt #1\color{black}}}
+
+%%%% DOMAIN-SPECIFIC SHORTCUTS
+
+%Real analysis related shortcuts
+\newcommand{\zeroonecl}{\bracks{0,1}}
+\newcommand{\forallepsgrzero}{\forall \epsilon > 0~~}
+\newcommand{\lessthaneps}{< \epsilon}
+\newcommand{\fraccomp}[1]{\text{frac}\bracks{#1}}
+
+%Bayesian related shortcuts
+\newcommand{\yrep}{y^{\text{rep}}}
+\newcommand{\yrepisq}{(\yrep_i)^2}
+\newcommand{\yrepvec}{\bv{y}^{\text{rep}}}
+
+
+%Probability shortcuts
+\newcommand{\SigField}{\mathcal{F}}
+\newcommand{\ProbMap}{\mathcal{P}}
+\newcommand{\probtrinity}{\parens{\Omega, \SigField, \ProbMap}}
+\newcommand{\convp}{~{\buildrel p \over \rightarrow}~}
+\newcommand{\convLp}[1]{~{\buildrel \Lp{#1} \over \rightarrow}~}
+\newcommand{\nconvp}{~{\buildrel p \over \nrightarrow}~}
+\newcommand{\convae}{~{\buildrel a.e. \over \longrightarrow}~}
+\newcommand{\convau}{~{\buildrel a.u. \over \longrightarrow}~}
+\newcommand{\nconvau}{~{\buildrel a.u. \over \nrightarrow}~}
+\newcommand{\nconvae}{~{\buildrel a.e. \over \nrightarrow}~}
+\newcommand{\convd}{~{\buildrel \mathcal{D} \over \rightarrow}~}
+\newcommand{\nconvd}{~{\buildrel \mathcal{D} \over \nrightarrow}~}
+\newcommand{\setequals}{~{\buildrel \text{set} \over =}~}
+\newcommand{\withprob}{~~\text{w.p.}~~}
+\newcommand{\io}{~~\text{i.o.}}
+
+\newcommand{\Acl}{\bar{A}}
+\newcommand{\ENcl}{\bar{E}_N}
+\newcommand{\diam}[1]{\text{diam}\parens{#1}}
+
+\newcommand{\taua}{\tau_a}
+
+\newcommand{\myint}[4]{\int_{#2}^{#3} #4 \,\text{d}#1}
+\newcommand{\laplacet}[1]{\mathscr{L}\bracks{#1}}
+\newcommand{\laplaceinvt}[1]{\mathscr{L}^{-1}\bracks{#1}}
+\renewcommand{\min}[1]{\text{min}\braces{#1}}
+\renewcommand{\max}[1]{\text{max}\braces{#1}}
+
+\newcommand{\Vbar}[1]{\bar{V}\parens{#1}}
+\newcommand{\expnegrtau}{\exp{-r\tau}}
+\newcommand{\pval}{p_{\text{val}}}
+\newcommand{\alphaovertwo}{\overtwo{\alpha}}
+
+%%% problem typesetting
+\newcommand{\problem}{\vspace{0.4cm} \noindent {\large{\textsf{Problem \arabic{probnum}~}}} \addtocounter{probnum}{1}}
+%\newcommand{\easyproblem}{\ingreen{\noindent \textsf{Problem \arabic{probnum}~}} \addtocounter{probnum}{1}}
+%\newcommand{\intermediateproblem}{\noindent \inyellow{\textsf{Problem \arabic{probnum}~}} \addtocounter{probnum}{1}}
+%\newcommand{\hardproblem}{\inred{\noindent \textsf{Problem \arabic{probnum}~}} \addtocounter{probnum}{1}}
+%\newcommand{\extracreditproblem}{\noindent \inpurple{\textsf{Problem \arabic{probnum}~}} \addtocounter{probnum}{1}}
+
+\newcommand{\easysubproblem}{\ingreen{\item}}
+\newcommand{\intermediatesubproblem}{\inyellow{\item}}
+\newcommand{\hardsubproblem}{\inred{\item}}
+\newcommand{\extracreditsubproblem}{\inpurple{\item}}
+\renewcommand{\labelenumi}{(\alph{enumi})}
+
+\newcommand{\nonep}{n_{1+}}
+\newcommand{\npone}{n_{+1}}
+\newcommand{\npp}{n_{++}}
+\newcommand{\noneone}{n_{11}}
+\newcommand{\nonetwo}{n_{12}}
+\newcommand{\ntwoone}{n_{21}}
+\newcommand{\ntwotwo}{n_{22}}
+
+\newcommand{\sigmahat}{\hat{\sigma}}
+\newcommand{\pihat}{\hat{\pi}}
+
+
+\newcommand{\probD}{\prob{D}}
+\newcommand{\probDC}{\prob{D^C}}
+\newcommand{\probE}{\prob{E}}
+\newcommand{\probEC}{\prob{E^C}}
+\newcommand{\probDE}{\prob{D,E}}
+\newcommand{\probDEC}{\prob{D,E^C}}
+\newcommand{\probDCE}{\prob{D^C,E}}
+\newcommand{\probDCEC}{\prob{D^C,E^C}}
+
+\newcommand{\logit}[1]{\text{logit}\parens{#1}}
+
+\newcommand{\errorrv}{\mathcal{E}}
+\newcommand{\berrorrv}{\bv{\errorrv}}
+\newcommand{\DIM}{\mathcal{I}}
+\newcommand{\trans}[1]{#1^\top}
+\newcommand{\transp}[1]{\parens{#1}^\top}
+
+\newcommand{\Xjmiss}{X_{j,\text{miss}}}
+\newcommand{\Xjobs}{X_{j,\text{obs}}}
+\newcommand{\Xminjmiss}{X_{-j,\text{miss}}}
+\newcommand{\Xminjobs}{X_{-j,\text{obs}}}
+
+\newcommand{\gammavec}{\bv{\gamma}}
+\newcommand{\transpose}[1]{\parens{#1}^{\top}}
+
+\newcommand{\Xtrain}{\X_{\text{train}}}
+\newcommand{\ytrain}{\y_{\text{train}}}
+\newcommand{\Xtest}{\X_{\text{test}}}
+
+\newcommand{\phat}{\hat{p}}
+
+
+\newcommand{\Hint}{H_{\text{internals}}}
+\newcommand{\Hterminals}{H_{\text{terminals}}}
+\newcommand{\Hleavesbelow}{H_{\text{leaves}\cdot\text{below}}}
+
+\newcommand{\padjeta}{p_{\text{adj}}(\eta)}
+\newcommand{\padjetastar}{p_{\text{adj}}(\eta^*)}
+\newcommand{\nadjeta}{n_{j\cdot\text{adj}}(\eta)}
+\newcommand{\nadjetastar}{n_{j^*\cdot\text{adj}}(\eta^*)}
+
+\newcommand{\nadjcheta}{n_{j\cdot\text{adj}\cdot\text{ch}}(\eta)}
+\newcommand{\nadjchetastar}{n_{j\cdot\text{adj}\cdot\text{ch}}(\eta^*)}
+
+\newcommand{\probsplit}[1]{\mathbb{P}_{\text{SPLIT}}\parens{#1}}
+\newcommand{\probrule}[1]{\mathbb{P}_{\text{RULE}}\parens{#1}}
+
+%change step stuff
+\newcommand{\etastar}{\eta_*}
+\newcommand{\etaone}{\eta_1}
+\newcommand{\etatwo}{\eta_2}
+\newcommand{\etaonestar}{\eta_{1^*}}
+\newcommand{\etatwostar}{\eta_{2^*}}
+
+\newcommand{\none}{n_{1}}
+\newcommand{\ntwo}{n_{2}}
+\newcommand{\Rones}{R_{1,1}, \ldots, R_{1, \none}}
+\newcommand{\Rtwos}{R_{2,1}, \ldots, R_{2, \ntwo}}
+
+\newcommand{\nonestar}{n_{1^*}}
+\newcommand{\ntwostar}{n_{2^*}}
+\newcommand{\Ronestars}{R_{1^*,1}, \ldots, R_{1^*, \nonestar}}
+\newcommand{\Rtwostars}{R_{2^*,1}, \ldots, R_{2^*, \ntwostar}}
+
+\newcommand{\Ronebar}{\bar{R}_1}
+\newcommand{\Rtwobar}{\bar{R}_2}
+\newcommand{\Ronebarstar}{\bar{R}_{1^*}}
+\newcommand{\Rtwobarstar}{\bar{R}_{2^*}}
+
+\newcommand{\Roneton}{R_1, \ldots, R_n}
+\newcommand{\Rlonetonl}{R_{\ell_1}, \ldots, R_{\ell_{n_\ell}}}
+\newcommand{\RLlonetonlL}{R_{\ell_{L,1}}, \ldots, R_{\ell_{L, n_{\ell,L}}}}
+\newcommand{\RRlonetonlR}{R_{\ell_{R,1}}, \ldots, R_{R,\ell_{n_{\ell,R}}}}
+\newcommand{\Rbar}{\bar{R}}
+
+\newcommand{\doneoversqrt}[1]{\doneover{\sqrt{#1}}}
+\newcommand{\doneover}[1]{\dfrac{1}{#1}}
+
+\newcommand{\sigsqmu}{\sigsq_\mu}
+\newcommand{\squaredfrac}[2]{\squared{\frac{#1}{#2}}}
+
+\author{Jonathan Roth\thanks{I discussed the contents of this problem set with Tzachi Raz, Talia Gillis, and Edoardo Acabbi. All solutions are my own.}}
+\title{Ec 2140: PSET 4}
+\begin{document}
+	\maketitle
+
+\begin{enumerate}[1.]
+
+%problem 1
+\item
+
+\begin{enumerate}
+	%a
+	\item
+First, observe that when $Z_i = 1$, we have
+
+\begin{align}
+s(T_i | x_i; \theta)^{1 - z_i}  \cdot s(c_i| x_i; \theta)^{z_i} &= s(T_i | x_i; \theta)^{0} \cdot s(c_i| x_i; \theta)^{1}\\
+&= s(y_i | x_i; \theta)
+\end{align}
+
+where the second equality follows from the fact that $c_i = y_i$ when $z_i = 1$. 
+
+Likewise, when $z_i = 0$, we have
+
+\begin{align}
+s(T_i | x_i; \theta)^{1 - z_i}  \cdot s(c_i| x_i; \theta)^{z_i} &= s(T_i | x_i; \theta)^{1} \cdot s(c_i| x_i; \theta)^{0}\\
+&= s(y_i | x_i; \theta)
+\end{align}
+
+where the second equality follows from the fact that $T_i = y_i$ when $z_i = 0$. 
+
+Hence, we have the identity
+
+\begin{align}
+s(T_i | x_i; \theta)^{1 - z_i}  \cdot s(c_i| x_i; \theta)^{z_i}&= s(y_i | x_i; \theta) \label{eqn:szidentity}
+\end{align}
+
+Now, the likelihood function is given by:
+
+\begin{align}
+	\mathcal{L}(Y,X;\theta) &= \prodonen{i}{  f(T_i| x_i; \theta)^{1-z_i} \cdot s(c_i| x_i ; \theta)^{z_i} }\\
+	 &= \prodonen{i}{ \left( \dfrac{ f(T_i| x_i; \theta)}{ s(T_i | x_i; \theta)} \right) ^{1-z_i}  s(T_i | x_i; \theta)^{1-z_i} \cdot s(c_i| x_i ; \theta)^{z_i} }\\
+	 &= \prodonen{i}{  \lambda(T_i| x_i; \theta)^{1-z_i} \cdot s(y_i| x_i ; \theta)} \label{eqn:L_general}
+\end{align}
+
+where the last line follows from the definition of the hazard and equation (\ref{eqn:szidentity}).
+
+I now turn to computing the conditional survivor function $s(t|x_i;\theta)$. We derived in lecture that 
+
+\begin{align}
+\Lambda(t|X_i; \theta) &= \int_{0}^{t} \lambda(v | x_i; \theta) dv = - \ln s(t| x_i; \theta)\\
+\implies s(t|x_i; \theta) &= \exp{-\Lambda(t|X_i; \theta)}
+\end{align}
+
+In our case, we have that 
+
+\begin{align}
+	\Lambda(t|X_i; \theta) &= \int_{0}^{t} \alpha v^{\alpha -1} \exp{x_i' \beta} dv\\
+	&= \alpha \exp{x_i' \beta} \frac{1}{\alpha} v^\alpha |^t_0\\
+	&= \exp{x_i' \beta} t^\alpha
+\end{align}
+
+and hence 
+
+\begin{align}
+	s(t|x_i; \theta) &= \exp{-\exp{x_i' \beta} t^\alpha}.
+\end{align}
+
+Plugging into equation (\ref{eqn:L_general}), we have 
+
+\begin{align}
+\mathcal{L}(Y,X;\theta) &= \prodonen{i}{ \left[  \alpha y_i^{\alpha-1} \exp{x_i' \beta}  \right]^{1 - z_i} \cdot \exp{-\exp{x_i' \beta} y_i^\alpha} }
+\end{align}
+
+Taking the log of the likelihood with respect to a single observation $i$, we have
+
+\begin{align}
+	l(y_i | x_i ; \theta) = (1 -z_i) \left[ \log \alpha + (\alpha - 1) \log y_i + x_i' \beta  \right] - \exp{x_i' \beta} y_i^\alpha
+\end{align}
+
+Now, differentiating with respect to $\alpha$ and $\beta$, we have
+
+\begin{align}
+\frac{\partial l(y_i | x_i ; \theta)}{\partial \alpha} &= (1 - z_i) \left[ \oneover{\alpha} + \log y_i \right] - \exp{x_i' \beta} \cdot \log{y_i} \cdot y_i^\alpha\\
+\text{and \hspace{1cm} }  \frac{\partial l(y_i | x_i ; \theta)}{\partial \beta} &= \left[ 1 - z_i - \exp{x_i' \beta} y_i^\alpha \right] x_i
+\end{align}
+
+so that the score function is given by
+
+\begin{align}
+	g(y_i | x_i ; \theta) = \twovec{\dfrac{\partial l(y_i | x_i ; \theta)}{\partial \alpha}}{\dfrac{\partial l(y_i | x_i ; \theta)}{\partial \beta}} = \twovec{(1 - z_i) \left[ \oneover{\alpha} + \log y_i \right] - \exp{x_i' \beta} \cdot \log{y_i} \cdot y_i^\alpha}{\left[ 1 - z_i - \exp{x_i' \beta} y_i^\alpha \right] x_i}
+\end{align}
+
+To find the Hessian of the log-likelihood function, we compute second derivatives
+
+
+\begin{align}
+  \partialdtwo{ l(y_i | x_i ; \theta)}{\alpha}{\alpha} &= - (1-z_i) \oneover{\alpha^2} - \exp{x_i' \beta} (\ln y_i)^2 y_i^\alpha \label{eqn:d2ldada}\\
+ \partialdtwo{ l(y_i | x_i ; \theta)}{\beta}{\beta'} &= -\exp{x_i' \beta} y_i^\alpha x_i x_i'\\
+  \partialdtwo{ l(y_i | x_i ; \theta)}{\beta}{\alpha} &= - \exp{x_i' \beta} (\ln y_i) y_i^\alpha x_i \label{eqn:d2ldadb}
+\end{align}
+
+The Hessian is then the $(k+1) \times (k+1)$ block matrix 
+
+\begin{align}
+	H(y_i|x_i; \theta) = \twobytwomat{\partialdtwo{ l(y_i | x_i ; \theta)}{\alpha}{\alpha}}{\partialdtwo{ l(y_i | x_i ; \theta)}{\beta'}{\alpha}}{\partialdtwo{ l(y_i | x_i ; \theta)}{\beta}{\alpha}}{\partialdtwo{ l(y_i | x_i ; \theta)}{\beta}{\beta'}}
+\end{align}
+
+where the block components are given in equations (\ref{eqn:d2ldada})-(\ref{eqn:d2ldadb}).
+
+%b
+\item
+The coefficients and standard errors estimated using maximum likelihood are shown in Table \ref{tbl:MLE_estimates}.
+
+
+\begin{table}[htbp]
+	\caption{Maximum Likelihood Coefficients and Standard Errors}
+	\label{tbl:MLE_estimates}
+	\begin{center}
+		\begin{tabular}{lrr}
+			Variable&Coefficient&Std. Error\\
+			\hline
+			$\alpha$&$2.1663$&$0.1321$\\
+			Constant&$-28.8682$&$8.4474$\\
+			Sex&$0.2450$&$0.2027$\\
+			Dex&$-0.0287$&$0.0159$\\
+			Lex&$2.4695$&$1.3638$\\
+			Lex$^2$&$-0.1030$&$0.0558$\\
+		\end{tabular}
+	\end{center}
+\end{table}
+
+
+%c
+\item
+Observe that the hazard function is $\lambda(T_i|x_i;\theta) = \alpha T_i^{\alpha-1} \exp{x_i' \beta}$, which is constant in $T_i$ if and only if $\alpha_0 = 1$. We are thus interested in testing the hypothesis that $\alpha_0 = 1$. 
+
+Note that under the assumptions of the model,
+\begin{align}
+\sqrt{n} (\hat{\theta}_{MLE} - \theta_0) \convd \normnot{0}{-H^{-1}}
+\end{align}
+
+where $H = \expe{\partialdtwo{l(y_i|x_i; \theta_0)}{\theta}{\theta'}}$. It follows that under the null hypothesis that $\alpha_0 = 1$, we have
+
+\begin{align}
+	t = \dfrac{\hat{\alpha}_{MLE} - 1}{SE_{\alpha}} \convd \normnot{0}{1}
+\end{align}
+
+where $SE_{\alpha}$ is the standard error calculated by evaluating the Hessian at the MLE (and presented in Table \ref{tbl:MLE_estimates}). Evaluating using our estimates, I obtain a t-value of $8.8266$, and thus we can reject the null hypothesis at all conventional levels (this is significant at at least the $10^{-9}$ level).
+
+%c
+\item
+
+The positive coefficient on Sex indicates that holding the other covariates constant (i.e. dexterity, education, and tenure), the hazard of a man leaving the company at a given point in time is higher than that for a comparable woman. Likewise, the negative coefficient on Dex indicates that, holding all else equal, more dexterous workers are less likely to leave the company at a given point in time. The positive coefficient on Lex and negative (and relatively small) coefficient on Lex$^2$ indicates that all else equal, more educated workers are generally more likely to leave, although the profile takes a concave shape, so that an additional year of education changes the estimated hazard less for more educated workers.\footnote{Owing to the quadratic function specified, the model actually predicts that an additional year of schooling decreases the hazard for workers with approximately 24 years of schooling, although this is well out of the range of schooling actually observed in the data.}
+
+As shown in part 1 (c), $\alpha$ is significantly greater than 1, which indicates that the baseline hazard is increasing over time. This means that between two workers that are identical (in terms of the covariates other than tenure) but have different tenure lengths, the longer-tenured worker has a higher probability of leaving at present than the shoter-tenured worker.
+
+
+\end{enumerate}
+
+%2
+\item
+
+\begin{enumerate}
+	%a
+	\item
+	
+	The density of prod1 using a normal kernel and the normal reference rule is shown in Figure \ref{fig:density}. I calclulate an optimal bandwidth of $ 0.4112$ for prod1, using the normal reference rule,  $h^* = 1.059 \sigma / N^{\frac{1}{5}}$.
+
+\begin{figure}[hbtp]
+	\begin{center}
+		\caption{Estimated Density of Prod1 Using Normal Kernel}
+		\label{fig:density}
+		\includegraphics[scale=.5]{density_optimalbw.png}
+	\end{center}
+\end{figure}
+
+\item
+
+The plot of the cross validation criterion as a function of the bandwidth ($h$) for (Nadaraya-Watson) kernel regression is shown in Figure \ref{fig:cv_kernel}. The optimal bandwidth, which minimizes the CV criterion, is $0.39$. A plot of the regression curve using the optimal bandwidth and a scatter plot of the data is shown in Figure \ref{fig:reg_kernel}.
+
+
+\begin{figure}[hbtp]
+	\begin{center}
+		\caption{Cross Validation Criterion - Kernel Regression}
+		\label{fig:cv_kernel}
+		\includegraphics[scale=.5]{cv_kernel.png}
+	\end{center}
+\end{figure}
+
+
+\begin{figure}[hbtp]
+	\begin{center}
+		\caption{Cross Validation Criterion - Kernel Regression}
+		\label{fig:reg_kernel}
+		\includegraphics[scale=.5]{kernel_optimalbw.png}
+	\end{center}
+\end{figure}
+
+
+\item
+
+
+The plot of the cross validation criterion as a function of the bandwidth ($h$) for local linear regression is shown in Figure \ref{fig:cv_linear}. The optimal bandwidth, which minimizes the CV criterion, is $2.00$. A plot of the regression curve using the optimal bandwidth and a scatter plot of the data is shown in Figure \ref{fig:reg_linear}.
+
+
+\begin{figure}[hbtp]
+	\begin{center}
+		\caption{Cross Validation Criterion - Local Linear Regression}
+		\label{fig:cv_linear}
+		\includegraphics[scale=.5]{cv_linear.png}
+	\end{center}
+\end{figure}
+
+
+\begin{figure}[hbtp]
+	\begin{center}
+		\caption{Cross Validation Criterion - Kernel Regression}
+		\label{fig:reg_linear}
+		\includegraphics[scale=.5]{linear_optimalbw.png}
+	\end{center}
+\end{figure}
+
+
+\item
+
+Figure \ref{fig:reg_both} shows both regression functions on the same plot (as before, the Nadaraya-Watson regression function is in green, and the local linear in orange). As can be seen, the local linear regression curve is more smooth than the Nadaraya-Waston curve. This is primarily because the optimal bandwidth selected for the local linear regression is wider than that for Nadaraya-Watson, which leads to a smoother curve.  For most of the range of the data, the two estimates are relatively close to one another, although they diverge substantially towards the right end of the data, where the productivity observations are more sparse. 
+
+It may be somewhat surprising that the Nadaraya-Watson curve lies above the local linear regression curve at the right end of the data, since both curves are increasing there. Usually, if the conditional expectation is increasing, then the kernel regression curve will be biased downwards at the right boundary of the data, since it only incorporates points to the left (which are lower). Attempting to correct for this bias is, in fact, one of the primary motivations for using local linear regression. Figure \ref{fig:reg_both_samebw} shows a plot similar to \ref{fig:reg_both}, except the local linear regression now uses the same bandwidth as in the kernel regression. As can be seen, in this case, the local linear regression curve does lie above the kernel regression curve at the right end of the data. What differs in Figure \ref{fig:reg_both} is that the bandwidth is much shorter for the kernel regression, so the curve is pulled upwards much more by the outlier at the ``northeast" of the plot. This counteracts the fact that the kernel regression is only incorporating points to the left, and thus leads the kernel regression curve to lie above the local linear regression curve, even though both functions are increasing.
+\begin{figure}[hbtp]
+	\begin{center}
+		\caption{Cross Validation Criterion - Both Regressions, Optimal Bandwidth}
+		\label{fig:reg_both}
+		\includegraphics[scale=.5]{both_optimalbw.png}
+	\end{center}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\begin{center}
+		\caption{Cross Validation Criterion - Both Regressions, Using Same Bandwidth}
+		\label{fig:reg_both_samebw}
+		\includegraphics[scale=.5]{both_samebw.png}
+	\end{center}
+\end{figure}
+
+
+\end{enumerate}
+\end{enumerate}
+
+\newpage
+\section*{Code}
+%\lstinputlisting{PSET_3_2140_2.m}
+%\lstinputlisting{"/Users/jonathanroth/Google Drive/Econ 2140/General Functions/latex2.m"}
+
+
+\end{document}
