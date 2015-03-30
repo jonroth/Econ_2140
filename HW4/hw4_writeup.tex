@@ -621,10 +621,10 @@ Now, the likelihood function is given by:
 
 where the last line follows from the definition of the hazard and equation (\ref{eqn:szidentity}).
 
-I now turn to computing the conditional survivor function $s(t|x_i;\theta)$. We derived in lecture that 
+I now turn to computing the survivor function $s(t|x_i;\theta)$. We derived in lecture that 
 
 \begin{align}
-\Lambda(t|X_i; \theta) &= \int_{0}^{t} \lambda(v | x_i; \theta) dv = - \ln s(t| x_i; \theta)\\
+\Lambda(t|X_i; \theta) &= \int_{0}^{t} \lambda(v | x_i; \theta) dv = - \log s(t| x_i; \theta)\\
 \implies s(t|x_i; \theta) &= \exp{-\Lambda(t|X_i; \theta)}
 \end{align}
 
@@ -671,9 +671,9 @@ To find the Hessian of the log-likelihood function, we compute second derivative
 
 
 \begin{align}
-  \partialdtwo{ l(y_i | x_i ; \theta)}{\alpha}{\alpha} &= - (1-z_i) \oneover{\alpha^2} - \exp{x_i' \beta} (\ln y_i)^2 y_i^\alpha \label{eqn:d2ldada}\\
+  \partialdtwo{ l(y_i | x_i ; \theta)}{\alpha}{\alpha} &= - (1-z_i) \oneover{\alpha^2} - \exp{x_i' \beta} (\log y_i)^2 y_i^\alpha \label{eqn:d2ldada}\\
  \partialdtwo{ l(y_i | x_i ; \theta)}{\beta}{\beta'} &= -\exp{x_i' \beta} y_i^\alpha x_i x_i'\\
-  \partialdtwo{ l(y_i | x_i ; \theta)}{\beta}{\alpha} &= - \exp{x_i' \beta} (\ln y_i) y_i^\alpha x_i \label{eqn:d2ldadb}
+  \partialdtwo{ l(y_i | x_i ; \theta)}{\beta}{\alpha} &= - \exp{x_i' \beta} (\log y_i) y_i^\alpha x_i \label{eqn:d2ldadb}
 \end{align}
 
 The Hessian is then the $(k+1) \times (k+1)$ block matrix 
@@ -686,7 +686,7 @@ where the block components are given in equations (\ref{eqn:d2ldada})-(\ref{eqn:
 
 %b
 \item
-The coefficients and standard errors estimated using maximum likelihood are shown in Table \ref{tbl:MLE_estimates}.
+The maximum-likelihood coefficients and Hessian-based standard errors are shown in Table \ref{tbl:MLE_estimates}.
 
 
 \begin{table}[htbp]
@@ -696,12 +696,12 @@ The coefficients and standard errors estimated using maximum likelihood are show
 		\begin{tabular}{lrr}
 			Variable&Coefficient&Std. Error\\
 			\hline
-			$\alpha$&$2.1663$&$0.1321$\\
-			Constant&$-28.8682$&$8.4474$\\
-			Sex&$0.2450$&$0.2027$\\
-			Dex&$-0.0287$&$0.0159$\\
-			Lex&$2.4695$&$1.3638$\\
-			Lex$^2$&$-0.1030$&$0.0558$\\
+			$\alpha$&$1.5747$&$0.0491$\\
+			Constant&$0.3795$&$2.0588$\\
+			Sex&$0.6171$&$0.0884$\\
+			Dex&$-0.1012$&$0.0065$\\
+			Lex&$-0.9486$&$0.3283$\\
+			Lex$^2$&$0.0380$&$0.0132$\\
 		\end{tabular}
 	\end{center}
 \end{table}
@@ -722,14 +722,14 @@ where $H = \expe{\partialdtwo{l(y_i|x_i; \theta_0)}{\theta}{\theta'}}$. It follo
 	t = \dfrac{\hat{\alpha}_{MLE} - 1}{SE_{\alpha}} \convd \normnot{0}{1}
 \end{align}
 
-where $SE_{\alpha}$ is the standard error calculated by evaluating the Hessian at the MLE (and presented in Table \ref{tbl:MLE_estimates}). Evaluating using our estimates, I obtain a t-value of $8.8266$, and thus we can reject the null hypothesis at all conventional levels (this is significant at at least the $10^{-9}$ level).
+where $SE_{\alpha}$ is the standard error calculated by evaluating the Hessian at the MLE (and presented in Table \ref{tbl:MLE_estimates}). Evaluating using our estimates, I obtain a t-value of $11.7046$, and thus we can reject the null hypothesis at all conventional levels (this is significant at at least the $10^{-9}$ level).
 
 %c
 \item
 
-The positive coefficient on Sex indicates that holding the other covariates constant (i.e. dexterity, education, and tenure), the hazard of a man leaving the company at a given point in time is higher than that for a comparable woman. Likewise, the negative coefficient on Dex indicates that, holding all else equal, more dexterous workers are less likely to leave the company at a given point in time. The positive coefficient on Lex and negative (and relatively small) coefficient on Lex$^2$ indicates that all else equal, more educated workers are generally more likely to leave, although the profile takes a concave shape, so that an additional year of education changes the estimated hazard less for more educated workers.\footnote{Owing to the quadratic function specified, the model actually predicts that an additional year of schooling decreases the hazard for workers with approximately 24 years of schooling, although this is well out of the range of schooling actually observed in the data.}
+The positive coefficient on Sex indicates that holding the other covariates constant (i.e. dexterity, education, and tenure), the estimated hazard of a man leaving the company at a given point in time is higher than that for a comparable woman, although the effect is not statistically significant at conventional levels. Likewise, the negative coefficient on Dex indicates that, holding all else equal, more dexterous workers are less likely to leave the company at a given point in time. The negative coefficient on Lex and positive (and relatively small) coefficient on Lex$^2$ indicates that all else equal, more educated workers generally have a lower risk of leaving, although the profile takes a convex shape, so that an additional year of education changes the estimated hazard less for more educated workers.\footnote{Owing to the quadratic function specified, the model actually predicts that an additional year of schooling increases the hazard for workers with approximately 25 or more years of schooling, although this is well out of the range of schooling actually observed in the data.} Except for the coefficient $\alpha$, all the coefficients are significant at the $5\%$ level.
 
-As shown in part 1 (c), $\alpha$ is significantly greater than 1, which indicates that the baseline hazard is increasing over time. This means that between two workers that are identical (in terms of the covariates other than tenure) but have different tenure lengths, the longer-tenured worker has a higher probability of leaving at present than the shoter-tenured worker.
+As shown in part 1 (c), $\alpha$ is significantly greater than 1, which indicates that the baseline hazard is increasing over time. This means that between two workers that are identical (in terms of the covariates other than tenure) but have different tenure lengths, the longer-tenured worker has a higher probability of leaving at present than the shorter-tenured worker.
 
 
 \end{enumerate}
@@ -756,6 +756,23 @@ As shown in part 1 (c), $\alpha$ is significantly greater than 1, which indicate
 The plot of the cross validation criterion as a function of the bandwidth ($h$) for (Nadaraya-Watson) kernel regression is shown in Figure \ref{fig:cv_kernel}. The optimal bandwidth, which minimizes the CV criterion, is $0.39$. A plot of the regression curve using the optimal bandwidth and a scatter plot of the data is shown in Figure \ref{fig:reg_kernel}.
 
 
+
+\item
+
+
+The plot of the cross validation criterion as a function of the bandwidth ($h$) for local linear regression is shown in Figure \ref{fig:cv_linear}. The optimal bandwidth, which minimizes the CV criterion, is $2.00$. A plot of the regression curve using the optimal bandwidth and a scatter plot of the data is shown in Figure \ref{fig:reg_linear}.
+
+
+
+
+\item
+
+Figure \ref{fig:reg_both} shows both regression functions on the same plot (as before, the Nadaraya-Watson regression function is in green, and the local linear in orange). As can be seen, the local linear regression curve is more smooth than the Nadaraya-Waston curve. This is primarily because the optimal bandwidth selected for the local linear regression is wider than that for Nadaraya-Watson, which leads to a smoother curve.  For most of the range of the data, the two estimates are relatively close to one another, although they diverge substantially towards the right end of the data, where the productivity observations are more sparse. 
+
+It may be somewhat surprising that the Nadaraya-Watson curve lies above the local linear regression curve at the right end of the data, since both curves are increasing there. Usually, if the conditional expectation is increasing, then the kernel regression curve will be biased downwards at the right boundary of the data, since it only incorporates points to the left (which have lower $y$ values). Attempting to correct for this bias is, in fact, one of the primary motivations for using local linear regression.\footnote{While the kernel regression will be biased near the boundary if the first derivative of the conditional expectation is non-zero, by similar logic the local linear regression will be biased if the \textit{second} derivative is non-zero. However, if the conditional expectation is linear or close to linear near the boundary, then the local linear regression will correct much of the boundary bias in kernel regression.} Figure \ref{fig:reg_both_samebw} shows a plot similar to Figure \ref{fig:reg_both}, except the local linear regression now uses the same bandwidth as in the kernel regression. As can be seen, in this case, the local linear regression curve does lie above the kernel regression curve at the right end of the data. What differs in Figure \ref{fig:reg_both} is that the bandwidth is much shorter for the kernel regression, so the curve is pulled upwards much more by the outlier at the ``northeast" of the plot. This counteracts the fact that the kernel regression is only incorporating points to the left, and thus leads the kernel regression curve to lie above the local linear regression curve, even though both curves are increasing.
+
+
+
 \begin{figure}[hbtp]
 	\begin{center}
 		\caption{Cross Validation Criterion - Kernel Regression}
@@ -773,11 +790,6 @@ The plot of the cross validation criterion as a function of the bandwidth ($h$) 
 	\end{center}
 \end{figure}
 
-
-\item
-
-
-The plot of the cross validation criterion as a function of the bandwidth ($h$) for local linear regression is shown in Figure \ref{fig:cv_linear}. The optimal bandwidth, which minimizes the CV criterion, is $2.00$. A plot of the regression curve using the optimal bandwidth and a scatter plot of the data is shown in Figure \ref{fig:reg_linear}.
 
 
 \begin{figure}[hbtp]
@@ -798,11 +810,8 @@ The plot of the cross validation criterion as a function of the bandwidth ($h$) 
 \end{figure}
 
 
-\item
 
-Figure \ref{fig:reg_both} shows both regression functions on the same plot (as before, the Nadaraya-Watson regression function is in green, and the local linear in orange). As can be seen, the local linear regression curve is more smooth than the Nadaraya-Waston curve. This is primarily because the optimal bandwidth selected for the local linear regression is wider than that for Nadaraya-Watson, which leads to a smoother curve.  For most of the range of the data, the two estimates are relatively close to one another, although they diverge substantially towards the right end of the data, where the productivity observations are more sparse. 
 
-It may be somewhat surprising that the Nadaraya-Watson curve lies above the local linear regression curve at the right end of the data, since both curves are increasing there. Usually, if the conditional expectation is increasing, then the kernel regression curve will be biased downwards at the right boundary of the data, since it only incorporates points to the left (which are lower). Attempting to correct for this bias is, in fact, one of the primary motivations for using local linear regression. Figure \ref{fig:reg_both_samebw} shows a plot similar to \ref{fig:reg_both}, except the local linear regression now uses the same bandwidth as in the kernel regression. As can be seen, in this case, the local linear regression curve does lie above the kernel regression curve at the right end of the data. What differs in Figure \ref{fig:reg_both} is that the bandwidth is much shorter for the kernel regression, so the curve is pulled upwards much more by the outlier at the ``northeast" of the plot. This counteracts the fact that the kernel regression is only incorporating points to the left, and thus leads the kernel regression curve to lie above the local linear regression curve, even though both functions are increasing.
 \begin{figure}[hbtp]
 	\begin{center}
 		\caption{Cross Validation Criterion - Both Regressions, Optimal Bandwidth}
