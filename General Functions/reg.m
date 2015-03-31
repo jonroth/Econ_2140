@@ -28,6 +28,7 @@ function[beta, se, Sigma, se_homo, Sigma_homo] = reg(y,X, const)
     %Calculate the SEs as sqrt of diagnol
     se = sqrt(diag(Sigma));
     
+    %Calculate the homoscedastic SEs and covariance mat
     n = length(y);
     k = size(X,2);
     Sigma_homo = 1/(n-k)*sum(u2)* inv(X'* X);
